@@ -368,7 +368,8 @@ public class Demo extends Activity {
 		}            
 
         HttpEntity entity = null;
-        HttpHost host = new HttpHost("192.168.219.97", 8080, "http");
+//        HttpHost host = new HttpHost("192.168.219.97", 8080, "http");
+        HttpHost host = new HttpHost("ls01.andlicensing.com", 80, "http");
     	try {
             final HttpResponse response = httpClient.execute(host, new HttpGet(uri.build().toString()));
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
