@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">AndLicensing Demo</string>
+    <string name="app_name">Demonstration of AndLicensing</string>
+    <string name="phoneNumberLock">Lock to Phone Number</string>
+    <string name="deviceLock">Lock to this Device</string>
+	<array name="licenseOptions">
+		<item>@string/phoneNumberLock</item>
+		<item>@string/deviceLock</item>
+	</array> 
+</resources>
