@@ -1,4 +1,4 @@
-package com.andlicensing.client;
+package com.andappstore.licensing.demo;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
@@ -48,6 +48,39 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class Demo extends Activity {
+	
+	//---------------------------------------------------------
+	//
+	// YOU WILL NEED TO ALTER THESE TO MATCH THE KEY DETAILS
+	// FOR YOUR APPLICATION
+	//
+	//----------------------------------------------------------
+
+	/**
+	 * Your master key pair ID
+	 */
+	
+	private static final String KEY_PAIR_ID = "";
+	
+
+	/**
+	 * The API Key for the key pair ID
+	 */
+	
+	private static final String KEY_PAIR_API_KEY = "";
+	
+	/**
+	 * The APP key as downloaded from Master Key Pair page at AndAppStore.com 
+	 */
+	
+	public static final byte[] APP_KEY= {};
+	
+	
+	//---------------------------------------------------------
+	//
+	// HERE ENDS THE CONFIGURATION SECTION.
+	//
+	//----------------------------------------------------------
 
 	/**
 	 * Menu item for the "Get new license" option.
@@ -83,27 +116,6 @@ public class Demo extends Activity {
 	 */
 	
 	private HttpClient httpClient;
-	
-	 /**
-	  * The key used to decode licenses.
-	  */
-	 
-	private static final byte[] LICENSE_DECODING_KEY = {
-		48,-126,1,34,48,13,6,9,42,-122,72,-122,-9,13,1,1,1,5,0,3,-126,
-		1,15,0,48,-126,1,10,2,-126,1,1,0,-101,-108,-79,90,-46,-68,-62,51,
-		108,-1,126,-85,-57,72,-41,113,37,68,48,37,-8,30,-33,-21,-122,-21,-37,97,
-		-98,-47,-87,-122,-11,86,-54,39,94,-127,55,27,-67,78,73,-101,-78,95,-111,-11,
-		20,18,-31,118,76,69,77,75,-18,27,-34,76,-45,-47,-121,32,46,125,68,50,
-		34,-126,-37,66,-28,76,5,-56,21,-1,58,-37,96,-110,-127,-64,112,-119,80,-17,
-		96,-26,-120,-64,39,79,-119,-5,-35,99,-105,96,-124,95,123,112,71,61,10,-14,
-		-118,79,-49,62,56,99,43,-125,-2,-22,-114,60,-19,-41,122,-60,4,3,-71,95,
-		-11,90,49,-98,-57,-30,-34,62,24,100,-128,26,-55,90,80,78,-86,36,123,84,
-		-95,-50,123,117,54,20,-50,24,96,-44,21,-22,-46,-23,103,-104,74,-98,126,-76,
-		-104,-118,97,-98,-43,31,-86,125,77,123,-30,95,-81,127,-40,121,55,-101,59,93,
-		-76,-36,28,-58,-91,-47,-11,-86,-121,-73,-117,-57,-94,-113,-91,118,-128,-32,-44,34,
-		-9,120,-72,-76,-7,-25,59,-80,43,-55,53,-22,89,-37,-23,-7,34,81,-86,25,
-		50,80,-55,32,-7,-36,76,-58,54,-73,-91,91,-30,116,28,70,123,127,-12,-49,
-		-88,-106,-107,-3,-10,-1,-85,3,2,3,1,0,1};
 
 	/**
 	 * This is a demo license which was generated with the generator key which was generated with the above decoding key
@@ -134,8 +146,8 @@ public class Demo extends Activity {
         final ThreadSafeClientConnManager manager = new ThreadSafeClientConnManager(params, registry);
         httpClient = new DefaultHttpClient(manager, params);
 
-        new AlertDialog.Builder(this).setTitle("AndLicensing Demo")
-          .setMessage("(c)Copright 2008 Al Sutton\nAll Rights Reserved.")
+        new AlertDialog.Builder(this).setTitle("AndAppStore Demo")
+          .setMessage("(c)Copright 2008\nFunky Android Ltd.\nAll Rights Reserved.\nUse is at users own risk.")
           .setPositiveButton("OK", null)
           .show(); 
     }
@@ -161,48 +173,53 @@ public class Demo extends Activity {
 	        textBuffer.append(getDeviceID());
 	        textBuffer.append("\n\n");
 	        
-			Properties license = readLicenseFile();
-			if(license == null) {
-				textBuffer.append("-= No License Present =-");
-			} else {
-		        textBuffer.append("-= License Details =-");
-
-		        textBuffer.append("\nExpiry = ");
-		        String x = license.getProperty("x");
-				if( x == null ) {
-					textBuffer.append("None");
+	        if (APP_KEY.length == 0) { 
+	        	textBuffer.append("-= PLEASE MODIFY THE SOURCE CODE AND INSERT YOUR KEY DETAILS IN Demo.java =-");				
+	        } else {	        
+				Properties license = readLicenseFile();
+				if(license == null) {
+					textBuffer.append("-= No License Present =-");
+				} if (APP_KEY.length == 0) { 
+					textBuffer.append("-= PLEASE MODIFY THE SOURCE CODE AND INSERT YOUR KEY DETAILS IN Demo.java =-");				
 				} else {
-					SimpleDateFormat xSdf = new SimpleDateFormat("yyyyMMdd");
-					Date expiry = xSdf.parse(x);
-					textBuffer.append(sf.format(expiry));
-					if(expiry.before(now)) {
-						textBuffer.append("\n** Expiry Check Failed **");
+			        textBuffer.append("-= License Details =-");
+	
+			        textBuffer.append("\nExpiry = ");
+			        String x = license.getProperty("e");
+					if( x == null ) {
+						textBuffer.append("None");
+					} else {
+						SimpleDateFormat xSdf = new SimpleDateFormat("yyyyMMdd");
+						Date expiry = xSdf.parse(x);
+						textBuffer.append(sf.format(expiry));
+						if(expiry.before(now)) {
+							textBuffer.append("\n** Expiry Check Failed **");
+						}
+					}
+	
+			        textBuffer.append("\nPhone Number Lock = ");
+			        String p = license.getProperty("p");
+					if( p == null ) {
+						textBuffer.append("None");
+					} else {
+						textBuffer.append(p);
+						if(!p.equals(getPhoneNumber())) {
+							textBuffer.append("\n** Phone Number Check Failed **");
+						}
+					}
+	
+			        textBuffer.append("\nDevice Lock = ");
+			        String d = license.getProperty("d");
+					if( d == null ) {
+						textBuffer.append("None");
+					} else {
+						textBuffer.append(d);
+						if(!d.equals(getDeviceID())) {
+							textBuffer.append("\n** Device Check Failed **");
+						}
 					}
 				}
-
-		        textBuffer.append("\nPhone Number Lock = ");
-		        String p = license.getProperty("p");
-				if( p == null ) {
-					textBuffer.append("None");
-				} else {
-					textBuffer.append(p);
-					if(!p.equals(getPhoneNumber())) {
-						textBuffer.append("\n** Phone Number Check Failed **");
-					}
-				}
-
-		        textBuffer.append("\nDevice Lock = ");
-		        String d = license.getProperty("d");
-				if( d == null ) {
-					textBuffer.append("None");
-				} else {
-					textBuffer.append(d);
-					if(!d.equals(getDeviceID())) {
-						textBuffer.append("\n** Device Check Failed **");
-					}
-				}
-			}
-			
+	        }
 	        text = textBuffer.toString();				
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -219,7 +236,7 @@ public class Demo extends Activity {
      */
     
     private Properties readLicenseFile() throws IOException, GeneralSecurityException {
-		byte[] license = new byte[256];
+		byte[] license = new byte[128];
 
 		try {
 			FileInputStream reader = openFileInput("AndLicense.001");
@@ -232,7 +249,7 @@ public class Demo extends Activity {
 			return null;
 		}
 
-        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(LICENSE_DECODING_KEY);
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(APP_KEY);
         KeyFactory factory = KeyFactory.getInstance("RSA");
         PublicKey key = factory.generatePublic(keySpec);
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -338,11 +355,15 @@ public class Demo extends Activity {
     
     private void downloadAndStoreLicense() {
         final Uri.Builder uri = new Uri.Builder();
-        uri.path("/AndroidApplicationLicensing/license!generate");
+        uri.path("/AndroidPhoneApplications/license/!generate");
+
+    	uri.appendQueryParameter("kid", KEY_PAIR_ID);
+    	uri.appendQueryParameter("key", KEY_PAIR_API_KEY);
+    	uri.appendQueryParameter("o", "TEST APP");
         
 		boolean phoneLock = preferenceList.isItemChecked(0);
         if(phoneLock) {
-        	uri.appendQueryParameter("p", getPhoneNumber());
+        	uri.appendQueryParameter("pn", getPhoneNumber());
 		}            
 
         boolean deviceLock = preferenceList.isItemChecked(1);
@@ -355,7 +376,7 @@ public class Demo extends Activity {
             		.setPositiveButton("OK", null)
             		.show();             	
         	} else {
-        		uri.appendQueryParameter("d", getDeviceID());
+        		uri.appendQueryParameter("did", getDeviceID());
         	}
 		}
         
@@ -364,12 +385,11 @@ public class Demo extends Activity {
         	Calendar expiryCal = Calendar.getInstance();
         	expiryCal.add(Calendar.DAY_OF_MONTH, 30);
         	SimpleDateFormat sf = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-        	uri.appendQueryParameter("x", sf.format(expiryCal.getTime()));
+        	uri.appendQueryParameter("exp", sf.format(expiryCal.getTime()));
 		}            
 
         HttpEntity entity = null;
-//        HttpHost host = new HttpHost("192.168.219.97", 8080, "http");
-        HttpHost host = new HttpHost("ls01.andlicensing.com", 80, "http");
+        HttpHost host = new HttpHost("licensing.andappstore.com", 80, "http");
     	try {
             final HttpResponse response = httpClient.execute(host, new HttpGet(uri.build().toString()));
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
